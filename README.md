@@ -94,6 +94,23 @@ const query = `{
 client.request(query).then(data => console.log(data)) 
 ```
 
+### Passing before request callback
+
+```js
+import { GraphQLClient } from 'graphql-request'
+
+GraphQLClient.callbacks = {
+  beforeRequest: function(options){
+    options.mode = 'cors'
+    // Options must be returned
+    return options
+  }
+}
+
+const client = new GraphQLClient('my-endpoint', {
+  credentials: 'include'
+})
+
 ### Using variables
 
 ```js

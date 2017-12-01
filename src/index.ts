@@ -1,4 +1,4 @@
-import { ClientError, Options, Variables } from './types'
+import { ClientError, Options, Variables, Callbacks } from './types'
 export { ClientError } from './types'
 import 'cross-fetch/polyfill'
 
@@ -11,19 +11,23 @@ export async function request<T extends any> (url: string, query: string, variab
 export default request
 
 export class GraphQLClient {
+  public static callbacks: Callbacks = {}
   private url: string
   private options: Options
-
   constructor (url: string, options?: Options) {
     this.url = url
     this.options = options || {}
   }
 
-  async request<T extends any> (query: string, variables?: Variables): Promise<T> {
+  public request = async <T extends any> (query: string, variables?: Variables): Promise<T> => {
     const body = JSON.stringify({
       query,
       variables: variables ? variables : undefined,
     })
+
+    if(typeof GraphQLClient.callbacks.beforeRequest == 'function'){
+      this.options = GraphQLClient.callbacks.beforeRequest(this.options)
+    }
 
     const response = await fetch(this.url, {
       method: 'POST',
@@ -42,6 +46,7 @@ export class GraphQLClient {
     }
   }
 }
+
 
 async function getResult (response: Response): Promise<any> {
   const contentType = response.headers.get('Content-Type')

@@ -12,6 +12,10 @@ export interface Options {
   integrity?: RequestInit['integrity']
 }
 
+export interface Callbacks {
+  beforeRequest?: Function
+}
+
 export interface GraphQLError {
   message: string
   locations: { line: number, column: number }[]
